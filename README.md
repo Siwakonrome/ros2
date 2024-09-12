@@ -1,4 +1,5 @@
 # ROS2 Humble Installation and Basic Usage Guide
+[Video Lectures](https://drive.google.com/drive/folders/1WSuRsSREymtOy1VKOJSTY6A9mEN_53nx?usp=sharing).
 
 ## Table of Contents
 1. [Basic Linux Commands](#basic-linux-commands)
