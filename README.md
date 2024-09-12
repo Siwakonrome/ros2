@@ -197,6 +197,7 @@ For a detailed guide on understanding ROS 2 topics, you can refer to the [ROS 2 
     ```
 ---
 ## ROS2 Services
+![App Screenshot](images/Topics.gif)
 
 In ROS 2, services are used for synchronous communication between nodes, allowing one node to send a request and receive a response from another node. For more information, visit the official ROS 2 documentation on services: [ROS 2 Services](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Services/Understanding-ROS2-Services.html).
 
