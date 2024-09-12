@@ -139,6 +139,7 @@ Node names can be remapped at runtime using the `--ros-args --remap` option. For
     ```
 ---
 ## ROS2 Topics
+![App Screenshot](images/Topics.gif)
 For a detailed guide on understanding ROS 2 topics, you can refer to the [ROS 2 documentation](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html).
 ### ROS2 Topics Monitor:
 - Type rqt_graph in the command:
