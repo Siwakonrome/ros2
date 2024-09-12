@@ -361,6 +361,7 @@ ROS 2 parameters allow you to configure nodes at runtime without changing the so
     ```
 ---
 ## ROS2 Actions
+![App Screenshot](images/Actions.gif)
 
 ROS 2 actions are used for goal-oriented, asynchronous communication where nodes can send goals, receive feedback, and get results. Actions are similar to services but allow for continuous feedback during execution. For more detailed information about actions, refer to the [ROS 2 Actions documentation](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html).
 
@@ -425,10 +426,6 @@ Launch files in ROS 2 allow you to start multiple nodes with predefined paramete
 			launch_ros.actions.Node(
 			    namespace= "turtlesim2", package='turtlesim', executable='turtlesim_node', output='screen'),
 		    ])
-		    
-	- ros2 topic pub  /turtlesim1/turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
-	
-	- 
     ```
 - To publish topic (turtlesim1):
     ```bash
