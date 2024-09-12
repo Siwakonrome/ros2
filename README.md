@@ -361,7 +361,7 @@ ROS 2 parameters allow you to configure nodes at runtime without changing the so
     ```
 ---
 ## ROS2 Actions
-![App Screenshot](images/Actions.gif)
+![App Screenshot](images/Actions.png)
 
 ROS 2 actions are used for goal-oriented, asynchronous communication where nodes can send goals, receive feedback, and get results. Actions are similar to services but allow for continuous feedback during execution. For more detailed information about actions, refer to the [ROS 2 Actions documentation](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html).
 
