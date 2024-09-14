@@ -180,6 +180,8 @@ Add the following script to `CMakeLists.txt` to check for Python and pip, and to
     ```
 ---
 ##  Odometry
+![App Screenshot](images/rviz2.png)
+
 - Use `nav_msgs/Odometry` and `tf2_ros/TransformBroadcaster` for odometry:
     ```bash
     from nav_msgs.msg import Odometry
@@ -216,9 +218,13 @@ Add the following script to `CMakeLists.txt` to check for Python and pip, and to
     ```
 ---
 ## RViz2
+![App Screenshot](images/rviz2.png)
+
 Refer to ROS 2 documentation for integrating RViz2 with nodes and topics for visualization.
 ---
 ## Simple Controller
+![App Screenshot](images/simple_controller.png)
+
 Use image processing and control methods as per the project requirements.
 ---
 
