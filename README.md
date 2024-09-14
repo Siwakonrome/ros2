@@ -1,4 +1,5 @@
 # ROS 2 Workspace Setup and Development Guide
+[Video Lectures](https://drive.google.com/drive/folders/10JGUxAyZ1yhHVFOV59r-1GX_yCHls2Np?usp=sharing).
 
 ## Table of Contents
 1. [Workspace and Packages](#workspace-and-packages)
