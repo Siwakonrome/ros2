@@ -85,7 +85,7 @@ Follow the instructions for installing ROS 2 Humble (deb packages) on Ubuntu Jam
 ---
 
 ## Adding Python Dependencies
-Add the following script to CMakeLists.txt to check for Python and pip, and to install dependencies:
+Add the following script to `CMakeLists.txt` to check for Python and pip, and to install dependencies:
 ```bash
     # Find Python executable
     find_program(PYTHON_EXECUTABLE python3)
