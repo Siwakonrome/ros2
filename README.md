@@ -228,5 +228,6 @@ Refer to ROS 2 documentation for integrating RViz2 with nodes and topics for vis
 Use image processing and control methods as per the project requirements.
 
 ![App Screenshot](images/simple_controller.png)
+![App Screenshot](images/eat_pizza.gif)
 ---
 
