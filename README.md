@@ -218,13 +218,15 @@ Add the following script to `CMakeLists.txt` to check for Python and pip, and to
     ```
 ---
 ## RViz2
-![App Screenshot](images/rviz2.png)
 
 Refer to ROS 2 documentation for integrating RViz2 with nodes and topics for visualization.
+
+![App Screenshot](images/rviz2.png)
 ---
 ## Simple Controller
-![App Screenshot](images/simple_controller.png)
 
 Use image processing and control methods as per the project requirements.
+
+![App Screenshot](images/simple_controller.png)
 ---
 
