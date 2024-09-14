@@ -225,9 +225,12 @@ Refer to ROS 2 documentation for integrating RViz2 with nodes and topics for vis
 ---
 ## Simple Controller
 
-Use image processing and control methods as per the project requirements.
+Control methods.
 
 ![App Screenshot](images/simple_controller.png)
+
+Result.
+
 ![App Screenshot](images/eat_pizza.gif)
 ---
 
