@@ -1,0 +1,24 @@
+<launch>
+  <!-- Declare arguments -->
+  <arg name="debug" default="False" description="Launch in debug mode with rqt tools"/>
+  <arg name="cam_name" default="cam_1" description="Camera name"/>
+  <arg name="config_path" default="camera_l.yaml" description="Camera configuration"/>
+  <arg name="fps" default="25.0" description="Camera fps"/>
+  <arg name="camera_product" default="PylonLineScanCameraDevices" description="Camera product"/>
+  <arg name="retry_times" default="3" description="Reconnection times"/>
+
+  <!-- Node configuration -->
+  <node pkg="lecture2" exec="camera_interface" name="camera_interface_node" output="screen">
+    <param name="cam_name" value="$(var cam_name)"/>
+    <param name="log_path" value="$(find-pkg-share lecture2)/log"/>
+    <param name="config_path" value="$(find-pkg-share lecture2)/config/$(var config_path)"/>
+    <param name="fps" value="$(var fps)"/>
+    <param name="camera_product" value="$(var camera_product)"/>
+    <param name="retry_times" value="$(var retry_times)"/>
+  </node>
+
+  <!-- Conditional launch for debug tools -->
+  <group if="$(var debug)">
+    <node pkg="rqt_gui" exec="rqt_gui" name="rqt_gui"/>
+  </group>
+</launch>

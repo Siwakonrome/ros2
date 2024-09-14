@@ -1,442 +1,224 @@
-# ROS2 Humble Installation and Basic Usage Guide
-[Video Lectures](https://drive.google.com/drive/folders/1WSuRsSREymtOy1VKOJSTY6A9mEN_53nx?usp=sharing).
+# ROS 2 Workspace Setup and Development Guide
 
 ## Table of Contents
-1. [Basic Linux Commands](#basic-linux-commands)
-2. [ROS 2 Installation](#ros-2-installation)
-3. [ROS 2 Basic Commands](#ros-2-basic-commands)
-4. [Understanding Nodes](#understanding-nodes)
-5. [Understanding Topics](#understanding-topics)
-6. [Understanding Services](#understanding-services)
-7. [Understanding Parameters](#understanding-parameters)
-8. [Understanding Actions](#understanding-actions)
-9. [Launching Nodes](#launching-nodes)
+1. [Workspace and Packages](#workspace-and-packages)
+2. [Creating Packages, Nodes, and Topics](#creating-packages-nodes-and-topics)
+3. [Cloning Repositories and Building](#cloning-repositories-and-building)
+4. [Adding Python Dependencies](#adding-python-dependencies)
+5. [Topic Publishing and Subscribing](#topic-publishing-and-subscribing)
+6. [Service Clients](#service-clients)
+7. [Odometry](#odometry)
+8. [Adding a Node](#adding-a-node)
+9. [RViz2](#rviz2)
+10. [Simple Controller](#simple-controller)
 
+## Workspace and Packages
+
+### Create ROS2 Workspace
+- Create a workspace:
+   ```bash
+   mkdir -p ~/ros2_ws/src
+   cd ~/ros2_ws
+   ```
+- Build the workspace:
+   ```bash
+   colcon build
+   ```
+- Install colcon using the following command:
+   ```bash
+   sudo apt install python3-colcon-common-extensions
+   ```
+- For more details, refer to the [Colcon Tutorial](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Colcon-Tutorial.html).
 ---
 
-## Basic Linux Commands
+## Creating Packages, Nodes, and Topics
+### Create Package using ROS2_pkg_cpp_py
 
-1. `ls` - List files in the current directory.
-2. `la` - List files in the current directory (including hidden files).
-3. `cd ..` - Move up one directory level.
-4. `pwd` - Print the current working directory.
-5. `cd Downloads/` - Change to the `Downloads` directory.
-6. `mkdir FIBO` - Create a new directory named `FIBO`.
-7. `cd FIBO/src/` - Change to the `src` directory under `FIBO`.
-8. `gedit test.txt` - Open or create `test.txt` using the gedit editor.
-9. `cp test.txt ~/FIBO/` - Copy `test.txt` to the `~/FIBO/` directory.
-10. `rm -r test.txt` - Delete the `test.txt` file.
-11. `rm -r src/` - Delete the `src/` directory and its contents.
-12. `sudo apt-get update` - Update the package lists for upgrades and new installations.
-
+- Create Package using ROS2_pkg_cpp_py
+   ```bash
+   git clone https://github.com/tchoopojcharoen/ROS2_pkg_cpp_py.git
+   ```
+- Generate the package:
+   ```bash
+   dos2unix ROS2_pkg_cpp_py/install_pkg.bash
+   . ROS2_pkg_cpp_py/install_pkg.bash {YOUR_WORKSPACE} {PACKAGE_NAME}
+   ```
+    Example:
+    ```bash
+    . ROS2_pkg_cpp_py/install_pkg.bash ros2_ws lecture2
+    ```
 ---
 
-## ROS2 Installation
+## Cloning Repositories and Building
 
 Follow the instructions for installing ROS 2 Humble (deb packages) on Ubuntu Jammy Jellyfish (22.04) from [this link](https://docs.ros.org/en/humble/Installation.html).
 
-### Steps:
-1. Install ROS 2 using the command:
+### Clone Example Packages:
+1. Clone the example repository into the workspace:
     ```bash
-    sudo apt install ros-humble-desktop-full
+    cd ~/ros2_ws
+    git clone https://github.com/ros2/examples src/examples -b humble
     ```
-2. Set up the ROS environment by adding the following to `.bashrc`:
+2. Build the workspace:
     ```bash
-    nano ~/.bashrc
-    source /opt/ros/humble/setup.bash
+    colcon build
     ```
-3. Test ROS 2 by running the following commands:
+3. Run example nodes:
     ```bash
-    ros2 run demo_nodes_cpp talker
-    ros2 run demo_nodes_py listener
+    ros2 run examples_rclcpp_minimal_subscriber subscriber_member_function
+    ros2 run examples_rclcpp_minimal_publisher publisher_member_function
     ```
-
+### Clone and Run [turtlesim_plus](https://github.com/tchoopojcharoen/turtlesim_plus)
+- Clone the turtlesim_plus repository:
+    ```bash
+    git clone https://github.com/tchoopojcharoen/turtlesim_plus.git ~/ros2_ws/src
+    ```
+- Build the workspace:
+    ```bash
+    colcon build
+    ```
+- Run the nodes:
+    ```bash
+    ros2 run turtlesim_plus turtlesim_plus_node.py
+    ros2 run turtlesim turtle_teleop_key
+    ```
 ---
 
-## ROS2 Basic Commands
-
-### Terminal always on top (Tip)
-You can keep your terminal always on top using settings in your terminal or desktop environment.
-
-### ROS2 CLI tools:
-- To set ROS Domain ID in `.bashrc`:
+## Adding Python Dependencies
+Add the following script to CMakeLists.txt to check for Python and pip, and to install dependencies:
+```bash
+    # Find Python executable
+    find_program(PYTHON_EXECUTABLE python3)
+    if(NOT PYTHON_EXECUTABLE)
+      message(FATAL_ERROR "Python 3 not found. Please install Python 3 to proceed.")
+    endif()
+    
+    # Find pip, or install it if not found
+    find_program(PIP_EXECUTABLE pip3)
+    if(NOT PIP_EXECUTABLE)
+      message(STATUS "pip not found. Attempting to install pip...")
+      # Install pip using get-pip.py
+      execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} -c "import urllib.request; urllib.request.urlretrieve('https://bootstrap.pypa.io/get-pip.py', 'get-pip.py')"
+        RESULT_VARIABLE DOWNLOAD_GET_PIP_RESULT
+      )
+      if(NOT DOWNLOAD_GET_PIP_RESULT EQUAL "0")
+        message(FATAL_ERROR "Failed to download get-pip.py.")
+      endif()
+      # Install pip locally
+      execute_process(
+        COMMAND ${PYTHON_EXECUTABLE} get-pip.py --user
+        RESULT_VARIABLE RUN_GET_PIP_RESULT
+      )
+      if(NOT RUN_GET_PIP_RESULT EQUAL "0")
+        message(FATAL_ERROR "Failed to install pip using get-pip.py.")
+      else
+        # Add ~/.local/bin to PATH
+        set(LOCAL_PIP_PATH "$ENV{HOME}/.local/bin")
+        if(EXISTS ${LOCAL_PIP_PATH})
+          set(ENV{PATH} "$ENV{PATH}:${LOCAL_PIP_PATH}")
+          find_program(PIP_EXECUTABLE pip3 PATHS ${LOCAL_PIP_PATH})
+        endif()
+      endif()
+      file(REMOVE get-pip.py)
+    endif()
+    
+    if(NOT PIP_EXECUTABLE)
+      message(FATAL_ERROR "Failed to install pip.")
+    endif()
+    
+    # Install Python dependencies from requirements.txt
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt")
+      execute_process(
+        COMMAND ${PIP_EXECUTABLE} install --user -r ${CMAKE_CURRENT_SOURCE_DIR}/requirements.txt
+        RESULT_VARIABLE PIP_INSTALL_RESULT
+      )
+      if(NOT PIP_INSTALL_RESULT EQUAL "0")
+        message(FATAL_ERROR "Failed to install Python dependencies using pip.")
+      endif()
+    endif()
+```
+## Topic Publishing and Subscribing
+### Publishing to a Topic
+- List topics:
     ```bash
-    export ROS_DOMAIN_ID=3
-    ```
-- To check if a package is installed:
-    ```bash
-    ros2 pkg executables turtlesim
-    ```
-- ROS 2 communication mechanism:
-    ```bash
-    ros2 node list
     ros2 topic list
-    ros2 service list
-    ros2 action list
     ```
-- Install `rqt` to monitor topics, services, and actions:
+- Publish to the `/turtle1/cmd_vel` topic:
     ```bash
-    sudo apt install '~nros-humble-rqt*'
+    ros2 topic pub /turtle1/cmd_vel geometry_msgs/msg/Twist "linear:
+          x: 0.0
+          y: 0.0
+          z: 0.0
+        angular:
+          x: 0.0
+          y: 0.0
+          z: 0.0"
     ```
-- To remap topics:
+### Subscribing to a Topic
+- View the type of a topic:
     ```bash
-    ros2 run turtlesim turtle_teleop_key --ros-args --remap /turtle1/cmd_vel:=/turtle2/cmd_vel
+    ros2 topic type /turtle1/pose
     ```
-
----
-
-## ROS2 Nodes
-![App Screenshot](images/Nodes.gif)
-
-For a deeper understanding of ROS 2 nodes and their communication mechanisms, visit the [official ROS 2 documentation](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Nodes/Understanding-ROS2-Nodes.html).
-
-### Node Communication Mechanism
-
-ROS2 nodes can communicate with each other through the following mechanisms:
-
-1. **Topics**: Unidirectional communication where one node can publish data and another node can subscribe to receive it.
-2. **Services**: Bidirectional communication where a node can send a request and another node can respond.
-3. **Actions**: Goal-oriented, asynchronous communication. Nodes can send a goal to another node and receive feedback during execution.
-
-### Remapping Node Names
-
-Node names can be remapped at runtime using the `--ros-args --remap` option. For example, to remap the node name from `turtlesim_node` to `my_turtle`, run the following command:
-- To remap node:
+- Display the topic information:
     ```bash
-    ros2 run turtlesim turtlesim_node --ros-args --remap __node:=my_turtle
-    ```
-### Node Information
-- To check node information:
-    ```bash
-    ros2 node info /my_turtle
-    ---
-    /my_turtle
-      Subscribers:
-        /parameter_events: rcl_interfaces/msg/ParameterEvent
-        /turtle1/cmd_vel: geometry_msgs/msg/Twist
-      Publishers:
-        /parameter_events: rcl_interfaces/msg/ParameterEvent
-        /rosout: rcl_interfaces/msg/Log
-        /turtle1/color_sensor: turtlesim/msg/Color
-        /turtle1/pose: turtlesim/msg/Pose
-      Service Servers:
-        /clear: std_srvs/srv/Empty
-        /kill: turtlesim/srv/Kill
-        /my_turtle/describe_parameters: rcl_interfaces/srv/DescribeParameters
-        /my_turtle/get_parameter_types: rcl_interfaces/srv/GetParameterTypes
-        /my_turtle/get_parameters: rcl_interfaces/srv/GetParameters
-        /my_turtle/list_parameters: rcl_interfaces/srv/ListParameters
-        /my_turtle/set_parameters: rcl_interfaces/srv/SetParameters
-        /my_turtle/set_parameters_atomically: rcl_interfaces/srv/SetParametersAtomically
-        /reset: std_srvs/srv/Empty
-        /spawn: turtlesim/srv/Spawn
-        /turtle1/set_pen: turtlesim/srv/SetPen
-        /turtle1/teleport_absolute: turtlesim/srv/TeleportAbsolute
-        /turtle1/teleport_relative: turtlesim/srv/TeleportRelative
-      Service Clients:
-      Action Servers:
-        /turtle1/rotate_absolute: turtlesim/action/RotateAbsolute
-      Action Clients:
+    ros2 interface show turtlesim/msg/Pose
     ```
 ---
-## ROS2 Topics
-![App Screenshot](images/Topics.gif)
-
-For a detailed guide on understanding ROS 2 topics, you can refer to the [ROS 2 documentation](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Topics/Understanding-ROS2-Topics.html).
-### ROS2 Topics Monitor:
-- Type rqt_graph in the command:
-    ```bash
-    rqt_graph
-    ```
-- To list all ros2 topics (including message type):
-    ```bash
-    ros2 topic list -t
-    ---
-    /parameter_events [rcl_interfaces/msg/ParameterEvent]
-    /rosout [rcl_interfaces/msg/Log]
-    /turtle1/cmd_vel [geometry_msgs/msg/Twist]
-    /turtle1/color_sensor [turtlesim/msg/Color]
-    /turtle1/pose [turtlesim/msg/Pose]
-    ```
-- To echo to see data that streamed from topic:
-    ```bash
-    ros2 topic echo /turtle1/cmd_vel
-    ```
-- To check topic information:
-    ```bash
-    ros2 topic info /turtle1/cmd_vel
-    ---
-    Type: geometry_msgs/msg/Twist
-    Publisher count: 1
-    Subscription count: 1
-    ```
-- To show topic interface:
-    ```bash
-    ros2 interface show geometry_msgs/msg/Twist
-    ---
-    # This expresses velocity in free space broken into its linear and angular parts.
-    Vector3  linear
-    	float64 x
-    	float64 y
-    	float64 z
-    Vector3  angular
-    	float64 x
-    	float64 y
-    	float64 z
-    ```
-- To publish topic (One times):
-    ```bash
-    Once ros2 topic pub --once /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
-    ```
-- To publish topic (With feq 1 hz):
-    ```bash
-    ros2 topic pub --rate 1 /turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
-    ```
-- To check topic rate:
-    ```bash
-    ros2 topic hz /turtle1/pose
-    ```
----
-## ROS2 Services
-![App Screenshot](images/Topics.gif)
-
-In ROS 2, services are used for synchronous communication between nodes, allowing one node to send a request and receive a response from another node. For more information, visit the official ROS 2 documentation on services: [ROS 2 Services](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Services/Understanding-ROS2-Services.html).
-
-### Basic Commands
-
+##  Service Clients
 - List available services:
     ```bash
     ros2 service list
     ```
-
-- Get the type of a specific service:
+- View the service type:
     ```bash
-    ros2 service type <service_name>
+    ros2 service type /turtle1/eat
     ```
-   Example:
-    ```bash
-    ros2 service type /clear
-    ```
-
-- List services with their types:
-    ```bash
-    ros2 service list -t
-    ```
-   Example output:
-    ```
-    /clear [std_srvs/srv/Empty]
-    /kill [turtlesim/srv/Kill]
-    /reset [std_srvs/srv/Empty]
-    /spawn [turtlesim/srv/Spawn]
-    /teleop_turtle/describe_parameters [rcl_interfaces/srv/DescribeParameters]
-    /teleop_turtle/get_parameter_types [rcl_interfaces/srv/GetParameterTypes]
-    /teleop_turtle/get_parameters [rcl_interfaces/srv/GetParameters]
-    /teleop_turtle/list_parameters [rcl_interfaces/srv/ListParameters]
-    /teleop_turtle/set_parameters [rcl_interfaces/srv/SetParameters]
-    /teleop_turtle/set_parameters_atomically [rcl_interfaces/srv/SetParametersAtomically]
-    /turtle1/set_pen [turtlesim/srv/SetPen]
-    /turtle1/teleport_absolute [turtlesim/srv/TeleportAbsolute]
-    /turtle1/teleport_relative [turtlesim/srv/TeleportRelative]
-    ```
-
-- Find all services of a particular type:
-    ```bash
-    ros2 service find <type_name>
-    ```
-   Example:
-    ```bash
-    ros2 service find std_srvs/srv/Empty
-    ```
-
-- Show service interface details:
-    ```bash
-    ros2 interface show <type_name>
-    ```
-   Example:
+- Show the service interface:
     ```bash
     ros2 interface show std_srvs/srv/Empty
-    ros2 interface show turtlesim/srv/Spawn
-    ```
-
-   Example interface for `turtlesim/srv/Spawn`:
-    ```
-    float32 x
-    float32 y
-    float32 theta
-    string name  # Optional. A unique name will be created if this is empty
-    ---
-    string name
-    ```
-
-### Service Call Examples
-
-- Call a service to spawn a turtle:
-    ```bash
-    ros2 service call /spawn turtlesim/srv/Spawn "{x: 2, y: 2, theta: 0.2, name: ''}"
-    ```
-
-- Call the spawn service with more detailed parameters:
-    ```bash
-    ros2 service call /spawn turtlesim/srv/Spawn "x: 3.8
-    y: 8.0
-    theta: 0.0
-    name: 'turtle2'"
-    ```
-
-- Call a service to clear the screen:
-    ```bash
-    ros2 service call /clear std_srvs/srv/Empty "{}"
     ```
 ---
-## ROS2 Parameters
-
-ROS 2 parameters allow you to configure nodes at runtime without changing the source code. You can list, get, set, dump, and load parameters for nodes. For more information on using parameters in ROS 2, refer to the [official ROS 2 documentation](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Parameters/Understanding-ROS2-Parameters.html).
-
-### Basic Commands
-
-- List all parameters for a node:
+##  Odometry
+- Use `nav_msgs/Odometry` and `tf2_ros/TransformBroadcaster` for odometry:
     ```bash
-    ros2 param list
+    from nav_msgs.msg import Odometry
+    from tf2_ros import TransformBroadcaster
     ```
-    Example output:
-    ```
-    /teleop_turtle:
-      qos_overrides./parameter_events.publisher.depth
-      qos_overrides./parameter_events.publisher.durability
-      qos_overrides./parameter_events.publisher.history
-      qos_overrides./parameter_events.publisher.reliability
-      scale_angular
-      scale_linear
-      use_sim_time
-    /turtlesim:
-      background_b
-      background_g
-      background_r
-      qos_overrides./parameter_events.publisher.depth
-      qos_overrides./parameter_events.publisher.durability
-      qos_overrides./parameter_events.publisher.history
-      qos_overrides./parameter_events.publisher.reliability
-      use_sim_time
-    ```
-
-- Get the value of a parameter:
+- Add dependencies in `package.xml`:
     ```bash
-    ros2 param get /turtlesim background_g
+    <depend>rclpy</depend>
+    <depend>nav_msgs</depend>
+    <depend>geometry_msgs</depend>
+    <depend>tf-transformations</depend>
     ```
-
-- Set the value of a parameter:
+- Add python dependencies lib in `requirements.txt`:
     ```bash
-    ros2 param set /turtlesim background_g 255
-    ```
-
-- Dump the parameters of a node to a YAML file:
-    ```bash
-    ros2 param dump /turtlesim > turtlesim.yaml
-    ```
-    Example command output:
-    ```bash
-    siwakon@siwakon-Nitro-AN515-55:~$ ls
-    Desktop    Downloads  Music     Public  Templates       Videos
-    Documents  FIBO       Pictures  snap    turtlesim.yaml
-    ```
-
-- Load parameters from a YAML file:
-    ```bash
-    ros2 param load /turtlesim turtlesim.yaml
-    ```
-    Example output:
-    ```
-    Set parameter background_b successful
-    Set parameter background_g successful
-    Set parameter background_r successful
-    Set parameter qos_overrides./parameter_events.publisher.depth failed: parameter 'qos_overrides./parameter_events.publisher.depth' cannot be set because it is read-only
-    Set parameter qos_overrides./parameter_events.publisher.durability failed: parameter 'qos_overrides./parameter_events.publisher.durability' cannot be set because it is read-only
-    Set parameter qos_overrides./parameter_events.publisher.history failed: parameter 'qos_overrides./parameter_events.publisher.history' cannot be set because it is read-only
-    Set parameter qos_overrides./parameter_events.publisher.reliability failed: parameter 'qos_overrides./parameter_events.publisher.reliability' cannot be set because it is read-only
-    Set parameter use_sim_time successful
-    ```
-
-- Run a node with parameters loaded from a file:
-    ```bash
-    ros2 run turtlesim turtlesim_node --ros-args --params-file turtlesim.yaml
+    transforms3d==0.4.2
     ```
 ---
-## ROS2 Actions
-![App Screenshot](images/Actions.png)
-
-ROS 2 actions are used for goal-oriented, asynchronous communication where nodes can send goals, receive feedback, and get results. Actions are similar to services but allow for continuous feedback during execution. For more detailed information about actions, refer to the [ROS 2 Actions documentation](https://docs.ros.org/en/humble/Tutorials/Beginner-CLI-Tools/Understanding-ROS2-Actions/Understanding-ROS2-Actions.html).
-
-### Basic Commands
-
-- List action servers for a node:
+## Adding a Node
+- Add the following lines to `CMakeLists.txt` to install Python executables:
     ```bash
-    ros2 node info /turtlesim
+    # Install Python executables
+    install(PROGRAMS
+    scripts/dummy_script.py
+    scripts/manual_teleop.py
+    DESTINATION lib/${PROJECT_NAME})
     ```
-    Example output:
-    ```
-    Action Servers: 
-    /turtle1/rotate_absolute: turtlesim/action/RotateAbsolute
-    ```
-
-- List available actions:
+- Change the script's permissions:
     ```bash
-    ros2 action list
+    sudo chmod +x manual_teleop.py
     ```
-
-- Show the interface of an action:
+- Rebuild the workspace:
     ```bash
-    ros2 interface show turtlesim/action/RotateAbsolute
-    ```
-    Example output:
-    ```
-    # The desired heading in radians
-    float32 theta
-    ---
-    # The angular displacement in radians to the starting position
-    float32 delta
-    ---
-    # The remaining rotation in radians
-    float32 remaining
-    ```
-
-- Send a goal to an action server:
-    ```bash
-    ros2 action send_goal /turtle1/rotate_absolute turtlesim/action/RotateAbsolute "theta: 1.57"
+    colcon build
     ```
 ---
+## RViz2
+Refer to ROS 2 documentation for integrating RViz2 with nodes and topics for visualization.
+---
+## Simple Controller
+Use image processing and control methods as per the project requirements.
+---
 
-## ROS2 Launching Nodes
-
-Launch files in ROS 2 allow you to start multiple nodes with predefined parameters and configurations.
-
-### Example Launch File
-
-- To launch multiple turtlesim nodes, create a launch file such as `multisim.launch.py`:
-    ```bash
-    ros2 launch turtlesim multisim.launch.py
-    ```
-    ```bash
-        # turtlesim/launch/multisim.launch.py
-		from launch import LaunchDescription
-		import launch_ros.actions
-
-		def generate_launch_description():
-		    return LaunchDescription([
-			launch_ros.actions.Node(
-			    namespace= "turtlesim1", package='turtlesim', executable='turtlesim_node', output='screen'),
-			launch_ros.actions.Node(
-			    namespace= "turtlesim2", package='turtlesim', executable='turtlesim_node', output='screen'),
-		    ])
-    ```
-- To publish topic (turtlesim1):
-    ```bash
-    ros2 topic pub  /turtlesim1/turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: 1.8}}"
-    ```
-- To publish topic (turtlesim2):
-    ```bash
-    ros2 topic pub  /turtlesim2/turtle1/cmd_vel geometry_msgs/msg/Twist "{linear: {x: 2.0, y: 0.0, z: 0.0}, angular: {x: 0.0, y: 0.0, z: -1.8}}"
-    ```
-
-
-
-    
