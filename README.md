@@ -1,5 +1,7 @@
 # Creating custom msg and srv files [tutorial](https://docs.ros.org/en/humble/Tutorials/Beginner-Client-Libraries/Custom-ROS2-Interfaces.html)
 
+[Video Lectures](https://drive.google.com/drive/folders/1jGeKOIWiad_GzL5rlh3OnR4Bi1f7OaLy?usp=sharing).
+
 ## Create a new package
    ```bash
    ros2 pkg create --build-type ament_cmake --license Apache-2.0 tutorial_interfaces
