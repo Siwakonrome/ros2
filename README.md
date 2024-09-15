@@ -243,7 +243,7 @@ def simple_controller(self, goal_position, index):
         self.goal_positions.pop(index)
         return vx, w
         
-    def timer_callback(self):
+ def timer_callback(self):
         if self.goal_positions:
             vx, w = self.simple_controller(goal_position=self.goal_positions[0], index=0)
             self.cmd_vel(v=vx, w=w)
