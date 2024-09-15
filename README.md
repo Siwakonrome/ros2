@@ -227,6 +227,29 @@ Refer to ROS 2 documentation for integrating RViz2 with nodes and topics for vis
 ## Simple Controller
 
 Control methods.
+    ```bash
+    def simple_controller(self, goal_position, index):
+        kp_d = 1.5
+        kp_w = 3.0
+        dp =  goal_position - np.array([self.robot_pose[0], self.robot_pose[1]])
+        vx = kp_d * np.linalg.norm(dp)
+        e = np.arctan2(dp[1],dp[0]) - self.robot_pose[2]
+        w = kp_w * np.arctan2(np.sin(e),np.cos(e))
+        if np.linalg.norm(dp) >= 0.5:
+            return vx, w
+        vx, w = 0.0, 0.0
+        self.goal_positions.pop(index)
+        return vx, w
+        
+    def timer_callback(self):
+        if self.goal_positions:
+            vx, w = self.simple_controller(goal_position=self.goal_positions[0], index=0)
+            self.cmd_vel(v=vx, w=w)
+            self.eat_pizza()
+        else:
+            self.cmd_vel(v=0.0, w=0.0)
+    ```
+
 
 ![App Screenshot](images/simple_controller.png)
 
