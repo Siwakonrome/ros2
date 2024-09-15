@@ -3,8 +3,8 @@
 
 ## Table of Contents
 1. [Basic Linux Commands](#basic-linux-commands)
-2. [ROS 2 Installation](#ros-2-installation)
-3. [ROS 2 Basic Commands](#ros-2-basic-commands)
+2. [ROS2 Installation](#ros-2-installation)
+3. [ROS2 Basic Commands](#ros-2-basic-commands)
 4. [Understanding Nodes](#understanding-nodes)
 5. [Understanding Topics](#understanding-topics)
 6. [Understanding Services](#understanding-services)
