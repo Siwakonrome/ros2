@@ -9,35 +9,28 @@ PACKAGE_NAME = 'lecture3_interfaces'
 
 def generate_launch_description():
 
-    mean_linear, variance_linear = 1.0, 0.1
-    mean_angular, variance_angular = 0.0, 3.0
-
     ld = LaunchDescription()
-    ld.add_action(
-        ExecuteProcess(
-            cmd=[[
-                FindExecutable(name='ros2'),
-                " service call ",
-                "/linear/set_noise ",
-                f"{PACKAGE_NAME}/srv/SetNoise ",
-                f'"{{mean: {{data: {mean_linear}}}, variance: {{data: {variance_linear}}}}}"',
-            ]],
-            shell=True
-        )
-    )
 
-    ld.add_action(
-        ExecuteProcess(
+    services = {
+            "linear": {"mean": 1.0, "var": 0.1},
+            "angular": {"mean": 0.0, "var": 3.0}
+    }
+
+    for key, value in services.items():
+        mean = value['mean']
+        variance = value['var']
+        execute_process = ExecuteProcess(
             cmd=[[
                 FindExecutable(name='ros2'),
                 " service call ",
-                "/angular/set_noise ",
+                f"/{key}/set_noise ",
                 f"{PACKAGE_NAME}/srv/SetNoise ",
-                f'"{{mean: {{data: {mean_angular}}}, variance: {{data: {variance_angular}}}}}"',
+                f'"{{mean: {{data: {mean}}}, variance: {{data: {variance}}}}}"',
             ]],
             shell=True
         )
-    )
+        ld.add_action(execute_process)
+
     return ld
 
 
