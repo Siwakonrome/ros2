@@ -227,6 +227,7 @@ Refer to ROS 2 documentation for integrating RViz2 with nodes and topics for vis
 ## Simple Controller
 
 Control methods.
+
     ```bash
     def simple_controller(self, goal_position, index):
         kp_d = 1.5
