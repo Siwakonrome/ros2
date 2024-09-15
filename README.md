@@ -228,8 +228,9 @@ Refer to ROS 2 documentation for integrating RViz2 with nodes and topics for vis
 
 Control methods.
 
-    ```bash
-    def simple_controller(self, goal_position, index):
+
+```python 
+def simple_controller(self, goal_position, index):
         kp_d = 1.5
         kp_w = 3.0
         dp =  goal_position - np.array([self.robot_pose[0], self.robot_pose[1]])
@@ -249,8 +250,7 @@ Control methods.
             self.eat_pizza()
         else:
             self.cmd_vel(v=0.0, w=0.0)
-    ```
-
+```
 
 ![App Screenshot](images/simple_controller.png)
 
