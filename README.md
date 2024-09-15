@@ -1,5 +1,5 @@
 ## Noise generator for control turtlesim plus ( Random Walk System )
-
+![App Screenshot](images/noise_generator.png)
 
 
 
