@@ -1,0 +1,62 @@
+<?xml version="1.0"?>
+<robot name="example" xmlns:xacro="http://www.ros.org/wiki/xacro">
+
+  <!-- Define common properties -->
+  <xacro:property name="effort_limit" value="1000.0"/>
+  <xacro:property name="velocity_limit" value="0.5"/>
+  <xacro:property name="joint_lower_limit" value="-3.14"/>
+  <xacro:property name="joint_upper_limit" value="3.14"/>
+
+  <!-- Define a macro for creating links with mesh files -->
+  <xacro:macro name="link_with_mesh" params="link_name mesh_file rpy_xyz origin_xyz">
+    <link name="${link_name}">
+      <visual>
+        <origin rpy="${rpy_xyz}" xyz="${origin_xyz}"/>
+        <geometry>
+          <mesh filename="${mesh_file}"/>
+        </geometry>
+      </visual>
+    </link>
+  </xacro:macro>
+
+  <!-- Define a macro for creating revolute joints -->
+  <xacro:macro name="revolute_joint" params="joint_name parent_link child_link origin_rpy origin_xyz axis_xyz">
+    <joint name="${joint_name}" type="revolute">
+      <limit effort="${effort_limit}" lower="${joint_lower_limit}" upper="${joint_upper_limit}" velocity="${velocity_limit}"/>
+      <parent link="${parent_link}"/>
+      <child link="${child_link}"/>
+      <origin rpy="${origin_rpy}" xyz="${origin_xyz}"/>
+      <axis xyz="${axis_xyz}"/>
+    </joint>
+  </xacro:macro>
+
+  <!-- Define links and joints using macros -->
+
+  <!-- Link 0 -->
+  <xacro:link_with_mesh link_name="link_0" mesh_file="package://example_description/meshes/link_0.stl" rpy_xyz="0 0 0" origin_xyz="0 0 0"/>
+
+  <!-- Link 1 -->
+  <xacro:link_with_mesh link_name="link_1" mesh_file="package://example_description/meshes/link_1.stl" rpy_xyz="0 0 0" origin_xyz="0 0 0"/>
+
+  <!-- Joint 1 connecting Link 0 to Link 1 -->
+  <xacro:revolute_joint joint_name="joint_1" parent_link="link_0" child_link="link_1" origin_rpy="0 0 0" origin_xyz="0 0 0.2" axis_xyz="0 0 1"/>
+
+  <!-- Link 2 -->
+  <xacro:link_with_mesh link_name="link_2" mesh_file="package://example_description/meshes/link_2.stl" rpy_xyz="0 0 -1.57" origin_xyz="0 0 0"/>
+
+  <!-- Joint 2 connecting Link 1 to Link 2 -->
+  <xacro:revolute_joint joint_name="joint_2" parent_link="link_1" child_link="link_2" origin_rpy="-1.57 0 0" origin_xyz="0 -0.12 0" axis_xyz="0 0 1"/>
+
+  <!-- Link 3 -->
+  <xacro:link_with_mesh link_name="link_3" mesh_file="package://example_description/meshes/link_3.stl" rpy_xyz="0 0 -1.57" origin_xyz="0 0 0"/>
+
+  <!-- Joint 3 connecting Link 2 to Link 3 -->
+  <xacro:revolute_joint joint_name="joint_3" parent_link="link_2" child_link="link_3" origin_rpy="0 0 0" origin_xyz="0 -0.25 0.1" axis_xyz="0 0 1"/>
+
+  <!-- End Effector -->
+  <xacro:link_with_mesh link_name="end_effector" mesh_file="package://example_description/meshes/end_effector.stl" rpy_xyz="0 0 0" origin_xyz="0 0 0"/>
+
+  <!-- Joint connecting Link 3 to End Effector -->
+  <xacro:revolute_joint joint_name="end_effector_to_joint_3" parent_link="link_3" child_link="end_effector" origin_rpy="1.57 0 0" origin_xyz="0 -0.28 0" axis_xyz="0 0 1"/>
+
+</robot>

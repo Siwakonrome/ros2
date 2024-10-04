@@ -1,0 +1,91 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="example">
+
+
+    <link name="link_0">
+        <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+            <mesh filename="package://example_description/meshes/link_0.stl"/>
+        </geometry>
+        </visual>
+    </link>
+
+
+    <link name="link_1">
+        <visual>
+        <origin rpy="0 0 0" xyz="0 0 0"/>
+        <geometry>
+            <mesh filename="package://example_description/meshes/link_1.stl"/>
+        </geometry>
+        </visual>
+    </link>
+
+
+    <joint name="joint_1" type="revolute">
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5"/>
+        <parent link="link_0"/>
+        <child link="link_1"/>
+        <!-- The axis of rotation is defined to be along the Z-axis of the parent link’s coordinate frame. -->
+        <!-- The rotation (rpy) is zero, so there is no change in the default orientation. -->
+        <axis rpy="0 0 0" xyz="0 0 1"/>
+        <origin rpy="0 0 0" xyz="0 0 0.2"/>
+    </joint>
+
+
+    <link name="link_2">
+        <visual>
+        <origin rpy="0 0 -1.57" xyz="0 0 0"/>
+        <geometry>
+            <mesh filename="package://example_description/meshes/link_2.stl"/>
+        </geometry>
+        </visual>
+    </link>
+
+
+    <joint name="joint_2" type="revolute">
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5"/>
+        <parent link="link_1"/>
+        <child link="link_2"/>
+        <axis rpy="0 0 0" xyz="0 0 1"/>
+        <origin rpy="-1.57 0 0" xyz="0 -0.12 0"/>
+    </joint>
+
+    <link name="link_3">
+        <visual>
+        <origin rpy="0 0 -1.57" xyz="0 0 0"/>
+        <geometry>
+            <mesh filename="package://example_description/meshes/link_3.stl"/>
+        </geometry>
+        </visual>
+    </link>
+
+
+    <joint name="joint_3" type="revolute">
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5"/>
+        <parent link="link_2"/>
+        <child link="link_3"/>
+        <axis rpy="0 0 0" xyz="0 0 1"/>
+        <origin rpy="0 0 0" xyz="0 -0.25 0.1"/>
+    </joint>
+
+
+    <link name="end_effector">
+        <visual>
+            <origin rpy="0 0 0" xyz="0 0 0"/>
+            <geometry>
+                <mesh filename="package://example_description/meshes/end_effector.stl"/>
+            </geometry>
+        </visual>
+    </link>
+
+    <joint name="end_effector_to_joint_3" type="revolute">
+        <limit effort="1000.0" lower="-3.14" upper="3.14" velocity="0.5"/>
+        <parent link="link_3"/>
+        <child link="end_effector"/>
+        <axis rpy="0 0 0" xyz="0 0 1"/>
+        <origin rpy="1.57 0 0" xyz="0 -0.28 0"/>
+    </joint>
+
+
+</robot>
